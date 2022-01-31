@@ -1,6 +1,8 @@
 let currentWay = "right";
+let way = currentWay;
 let apple;
-let parts = 5;
+let parts = 10;
+let growCount = 20;
 
 const appleEatSound = new Audio("./assets/sounds/apple_eat.wav");
 const gameOverSound = new Audio("./assets/sounds/game_over.wav");
@@ -48,25 +50,27 @@ export const Snake = ({ width, height, size, ctx, color, onGrow, onDeath }) => {
         }
     ];
 
-    const move = way => {
+    const move = () => {
         let head = body[body.length - 1];
         let x = head.x;
         let y = head.y;
 
-        way = validateWay(way)? way : currentWay;
+        if((x % 10 === 0) && (y % 10 === 0) && validateWay(way)) {
+            currentWay = way;
+        }
 
-        switch (way) {
+        switch (currentWay) {
             case "right":
-                x = increment({limit: width, step: size, body: x});
+                x = increment({limit: width, step: 1, body: x});
                 break;
             case "down":
-                y = increment({limit: height, step: size, body: y});
+                y = increment({limit: height, step: 1, body: y});
                 break;
             case "left":
-                x = decrement({limit: width, step: size, body: x});
+                x = decrement({limit: width, step: 1, body: x});
                 break;
             case "up":
-                y = decrement({limit: height, step: size, body: y});
+                y = decrement({limit: height, step: 1, body: y});
         }
 
         if(body.find(part => part.x === x && part.y === y) !== undefined) { // body.reduce((acc, item) => {if(item.x === x && item.y === y) acc = true;}, false)
@@ -80,13 +84,11 @@ export const Snake = ({ width, height, size, ctx, color, onGrow, onDeath }) => {
                 }
             ]
         } else {
-            currentWay = way;
             body.push({x, y});
             if(apple) {
-                if((-5 <= x - apple.x && x - apple.x <= 5) && (-5 <= y - apple.y && y - apple.y <= 5)) {
+                if(x === apple.x && y === apple.y) {
                     grow();
                     if(onGrow) onGrow();
-                    apple.spawned = false;
                 }
             }
             if(parts > 0) {
@@ -99,11 +101,11 @@ export const Snake = ({ width, height, size, ctx, color, onGrow, onDeath }) => {
 
     const grow = () => {
         appleEatSound.play();
-        parts += 5;
+        parts += growCount;
     };
 
-    const setWay = way => {
-        currentWay = validateWay(way)? way : currentWay;
+    const setWay = val => {
+        way = validateWay(val)? val : currentWay;
     }
 
     const draw = () => {

@@ -8,13 +8,13 @@ const height = 600;
 const ctx = canvas.getContext("2d");
 const score = Score();
 
-const snakeColor = "green";
-const appleColor = "red";
+const snakeColor = "#8bc34a";
+const appleColor = "#e91e63";
 const appleSize = 10;
 const snakeSize = 10;
-const fps = 20;
-let coeficient = 1.1;
+const coeficient = 1.2;
 
+let fps = 50;
 let snake;
 let apple;
 let loop;
@@ -53,16 +53,20 @@ const game = () => {
 };
 
 const onGrow = () => {
+    fps *= coeficient;
     score.setScore(score.getScore() + 1);
+    apple.spawned = false;
     if(typeof loop != 'undefined') {
         clearInterval(loop);
-        loop = setInterval(game, 1000 / (fps * coeficient));
+        loop = setInterval(game, 1000 / fps);
     }
-    coeficient += 0.1;
 };
 
 const onDeath = () => {
     score.setScore(0);
+    fps = 50;
+    clearInterval(loop);
+    loop = setInterval(game, 1000 / fps);
 };
 
 const play = () => {
